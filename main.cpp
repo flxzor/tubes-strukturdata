@@ -1,22 +1,30 @@
-// main.cpp
 #include "Quest.h"
+#include "Player.h"
+#include <iostream>
+using namespace std;
 
 int main() {
     QuestManager qm;
+    PlayerManager pm;
     int choice;
 
     while (true) {
-        cout << "\n=== Quest Manager ===\n";
+        cout << "\n=== MAIN MENU ===\n";
         cout << "1. Create Main Quest\n";
         cout << "2. Create Subquest\n";
         cout << "3. Update Quest\n";
         cout << "4. Delete Quest\n";
         cout << "5. Show All Quests\n";
+        cout << "6. Register Player\n";
+        cout << "7. Player Login\n";
+        cout << "8. Assign Quest to Player\n";
+        cout << "9. Remove Player Quest\n";
+        cout << "10. Show All Players\n";
         cout << "0. Exit\n";
         cout << "Choose: ";
         cin >> choice;
 
-        cin.ignore(); // buang newline
+        cin.ignore();
 
         if (choice == 0) break;
 
@@ -53,6 +61,90 @@ int main() {
 
         else if (choice == 5) {
             qm.showAll();
+        }
+
+        else if (choice == 6) {
+            string u, p;
+            cout << "Username: "; cin >> u;
+            cout << "Password: "; cin >> p;
+            pm.registerPlayer(u, p);
+        }
+
+        else if (choice == 7) {
+            string u, p;
+            cout << "Username: "; cin >> u;
+            cout << "Password: "; cin >> p;
+
+            Player* pl = pm.login(u, p);
+            if (!pl) {
+                cout << "Login failed.\n";
+                continue;
+            }
+
+            int pc;
+            while (true) {
+                cout << "\n=== Player Menu ===\n";
+                cout << "1. View My Quests\n";
+                cout << "0. Logout\n";
+                cout << "Choose: ";
+                cin >> pc;
+
+                if (pc == 0) break;
+
+                if (pc == 1) {
+                    cout << "\n=== My Quests ===\n";
+                    for (int qid : pl->questIds) {
+                        Quest* q = qm.find(qid);
+                        if (q) cout << "- [" << q->id << "] " << q->title << "\n";
+                    }
+                }
+            }
+        }
+
+        else if (choice == 8) {
+            string username;
+            int qid;
+
+            cout << "Player username: ";
+            cin >> username;
+
+            cout << "Quest ID: ";
+            cin >> qid;
+
+            Player* pl = pm.findPlayer(username);
+            if (!pl) {
+                cout << "Player not found.\n";
+                continue;
+            }
+
+            Quest* q = qm.find(qid);
+            if (!q) {
+                cout << "Quest ID not found.\n";
+                continue;
+            }
+
+            pm.assignQuest(pl, qid);
+        }
+        else if (choice == 9) {
+            string username;
+            int qid;
+
+            cout << "Player username: ";
+            cin >> username;
+
+            cout << "Quest ID to remove: ";
+            cin >> qid;
+
+            Player* pl = pm.findPlayer(username);
+            if (!pl) {
+                cout << "Player not found.\n";
+                continue;
+            }
+
+            pm.removeQuest(pl, qid);
+        }
+        else if (choice == 10) {
+            pm.showAllPlayers();
         }
     }
 
