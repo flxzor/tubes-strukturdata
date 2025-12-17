@@ -1,7 +1,6 @@
-// Quest.cpp
 #include "Quest.h"
 
-// ======================== Quest =========================
+// ================= Quest =================
 
 Quest::Quest(int id, const string& title, const string& desc)
     : id(id), title(title), description(desc) {}
@@ -11,21 +10,24 @@ void Quest::addSubquest(Quest* q) {
 }
 
 void Quest::printTree(int depth) {
-    for (int i = 0; i < depth; i++) cout << "  ";
-    cout << "- [" << id << "] " << title << "\n";
+    for (int i = 0; i < depth; i++)
+        cout << "  ";
 
-    for (auto c : children) c->printTree(depth + 1);
+    cout << "- [" << id << "] " << title << endl;
+
+    for (auto c : children)
+        c->printTree(depth + 1);
 }
 
-// ==================== QuestManager ======================
+// ================= QuestManager =================
 
 Quest* QuestManager::findQuest(Quest* node, int id) {
     if (!node) return nullptr;
     if (node->id == id) return node;
 
     for (auto c : node->children) {
-        Quest* result = findQuest(c, id);
-        if (result) return result;
+        Quest* res = findQuest(c, id);
+        if (res) return res;
     }
     return nullptr;
 }
@@ -62,7 +64,8 @@ void QuestManager::updateQuest(int id, const string& newTitle, const string& new
 }
 
 void QuestManager::deleteRecursive(Quest* node) {
-    for (auto c : node->children) deleteRecursive(c);
+    for (auto c : node->children)
+        deleteRecursive(c);
     delete node;
 }
 
@@ -93,5 +96,58 @@ void QuestManager::showAll() {
         cout << "No quests available.\n";
         return;
     }
-    for (auto r : roots) r->printTree();
+
+    cout << "\n=== ALL QUESTS ===\n";
+    for (auto r : roots)
+        r->printTree();
+}
+
+// ================= TRAVERSAL =================
+
+// Preorder: NODE -> CHILDREN
+void QuestManager::preorder(Quest* node) {
+    if (!node) return;
+
+    cout << node->id << " - " << node->title << endl;
+
+    for (auto c : node->children)
+        preorder(c);
+}
+
+// Inorder (N-ary): FIRST CHILD -> NODE -> REST CHILDREN
+void QuestManager::inorder(Quest* node) {
+    if (!node) return;
+
+    if (!node->children.empty())
+        inorder(node->children[0]);
+
+    cout << node->id << " - " << node->title << endl;
+
+    for (int i = 1; i < node->children.size(); i++)
+        inorder(node->children[i]);
+}
+
+// Postorder: CHILDREN -> NODE
+void QuestManager::postorder(Quest* node) {
+    if (!node) return;
+
+    for (auto c : node->children)
+        postorder(c);
+
+    cout << node->id << " - " << node->title << endl;
+}
+
+void QuestManager::traversePreorder() {
+    for (auto r : roots)
+        preorder(r);
+}
+
+void QuestManager::traverseInorder() {
+    for (auto r : roots)
+        inorder(r);
+}
+
+void QuestManager::traversePostorder() {
+    for (auto r : roots)
+        postorder(r);
 }

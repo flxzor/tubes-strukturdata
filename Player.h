@@ -26,7 +26,6 @@ public:
 
     void assignQuest(Player* player, int questId);
     void removeQuest(Player* player, int questId);
-
     void showAllPlayers();
 };
 
